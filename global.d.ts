@@ -1,3 +1,0 @@
-type serverError = {
-  message: string;
-};

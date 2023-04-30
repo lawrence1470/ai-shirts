@@ -1,22 +1,38 @@
+import ServerError from "ServerError";
 import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
+import Image from "next/image";
 
 import { api } from "~/utils/api";
 
+
 const Home: NextPage = () => {
+  const [imageText, setImageText] = React.useState<string>("");
+  const [imageUrl, setImageUrl] = React.useState<string>("");
+
   const createImage = api.example.createImage.useMutation();
 
-  const [imageText, setImageText] = React.useState<string>("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = void (async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     const response = await createImage.mutateAsync({ text: imageText });
-    console.log(response);
-    localStorage.setItem("image", response.data.imageUrl);
-  };
+    if(response instanceof ServerError){
+      // Todo set error
+      return
+    }
+
+    localStorage.setItem("imageUrl", response.imageUrl);
+    setImageUrl(response.imageUrl);
+  });
+
+  useEffect(() => {
+    const imageUrlFromLocalStorage = localStorage.getItem("imageUrl");
+    if (imageUrlFromLocalStorage) {
+      setImageUrl(imageUrlFromLocalStorage);
+    }
+  }, []);
 
 
   return (
@@ -49,6 +65,10 @@ const Home: NextPage = () => {
               Create
             </button>
           </form>
+
+          {imageUrl && (
+            <Image width={100} height={10} alt='image generated' className="w-1/2" src={imageUrl} />
+          )}
         </div>
       </main>
     </>

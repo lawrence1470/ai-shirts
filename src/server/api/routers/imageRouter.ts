@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { openai } from "~/server/configuration";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import ServerError from "ServerError";
 
 export const imageRouter = createTRPCRouter({
   hello: publicProcedure
@@ -16,13 +17,12 @@ export const imageRouter = createTRPCRouter({
   createImage: publicProcedure
     .input(z.object({ text: z.string() }))
     .mutation(
-      async ({ input }): Promise<{ imageUrl: string } | serverError> => {
-        console.log("here");
+      async ({ input }): Promise<{ imageUrl: string } | ServerError> => {
         try {
           const response = await openai.createImage({
             prompt: input.text,
             n: 1,
-            size: "512x512",
+            size: "1024x1024",
           });
           console.log(response, "this is the response");
           if (response.data.data[0]) {
@@ -31,9 +31,9 @@ export const imageRouter = createTRPCRouter({
               return { imageUrl };
             }
           }
-          throw new Error("No image found");
+          throw new Error();
         } catch (error) {
-          return { message: "No image found" };
+          return new ServerError("No image found");
         }
       }
     ),
