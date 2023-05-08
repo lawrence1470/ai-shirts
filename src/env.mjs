@@ -10,6 +10,7 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(["development", "test", "production"]),
     OPEN_AI_API_KEY: z.string(),
+    STRIPE_SK: z.string(),
   },
 
   /**
@@ -29,6 +30,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     OPEN_AI_API_KEY: process.env.OPEN_AI_API_KEY,
+    STRIPE_SK: process.env.STRIPE_SK,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
 });

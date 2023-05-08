@@ -5,27 +5,28 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 
 import { api } from "~/utils/api";
-
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
+  const router = useRouter();
   const [imageText, setImageText] = React.useState<string>("");
   const [imageUrl, setImageUrl] = React.useState<string>("");
 
-  const createImage = api.example.createImage.useMutation();
+  const createImage = api.imageRouter.createImage.useMutation();
+  const sessionApi = api.stripeRouter.createCheckoutSession.useMutation();
 
-
-  const handleSubmit = void (async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     const response = await createImage.mutateAsync({ text: imageText });
-    if(response instanceof ServerError){
+    if (response instanceof ServerError) {
       // Todo set error
-      return
+      return;
     }
 
     localStorage.setItem("imageUrl", response.imageUrl);
     setImageUrl(response.imageUrl);
-  });
+  };
 
   useEffect(() => {
     const imageUrlFromLocalStorage = localStorage.getItem("imageUrl");
@@ -34,6 +35,15 @@ const Home: NextPage = () => {
     }
   }, []);
 
+  const handleBuy = async () => {
+    console.log("buying");
+    const sessionUrl = await sessionApi.mutateAsync();
+    console.log(sessionUrl);
+    if (sessionUrl) {
+      void router.push(sessionUrl);
+    }
+    // redirect to stripe id
+  };
 
   return (
     <>
@@ -48,7 +58,10 @@ const Home: NextPage = () => {
             AI SHIRT APP
           </h1>
 
-          <form onSubmit={handleSubmit} className="w-full flex flex-col items-center justify-center gap-4">
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full flex-col items-center justify-center gap-4"
+          >
             <label className="text-black">What do you want to make </label>
             <input
               className="w-full rounded-md border border-gray-400 px-4 py-2"
@@ -59,7 +72,7 @@ const Home: NextPage = () => {
               placeholder="Type in the image you want to create"
             />
             <button
-              className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="w-full rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
               type="submit"
             >
               Create
@@ -67,9 +80,22 @@ const Home: NextPage = () => {
           </form>
 
           {imageUrl && (
-            <Image width={100} height={10} alt='image generated' className="w-1/2" src={imageUrl} />
+            <Image
+              width={100}
+              height={10}
+              alt="image generated"
+              className="w-1/2"
+              src={imageUrl}
+            />
           )}
         </div>
+        <button
+          className="w-full rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+          type="button"
+          onClick={() => handleBuy()}
+        >
+          Buy something
+        </button>
       </main>
     </>
   );
