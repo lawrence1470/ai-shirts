@@ -37,7 +37,7 @@ const Home: NextPage = () => {
 
   const handleBuy = async () => {
     console.log("buying");
-    const sessionUrl = await sessionApi.mutateAsync();
+    const sessionUrl = await sessionApi.mutateAsync({ url: imageUrl });
     console.log(sessionUrl);
     if (sessionUrl) {
       void router.push(sessionUrl);
