@@ -11,6 +11,7 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "test", "production"]),
     OPEN_AI_API_KEY: z.string(),
     STRIPE_SK: z.string(),
+    PRINTFUL_TOKEN: z.string(),
   },
 
   /**
@@ -31,6 +32,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     OPEN_AI_API_KEY: process.env.OPEN_AI_API_KEY,
     STRIPE_SK: process.env.STRIPE_SK,
+    PRINTFUL_TOKEN: process.env.PRINTFUL_TOKEN,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
 });

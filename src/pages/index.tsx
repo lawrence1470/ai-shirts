@@ -7,12 +7,18 @@ import Image from "next/image";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
 
+// var sampleImageURL = "http://localhost:3000/_next/image?url=https%3A%2F%2Foaidalleapiprodscus.blob.core.windows.net%2Fprivate%2Forg-MKGuuPRnuzIaJG2av1K2zTjU%2Fuser-WVycIZvP76uEBxezvnhfSyei%2Fimg-c1DzSMH9CTzMXksy4P2yVnd6.png%3Fst%3D2023-05-12T03%253A37%253A35Z%26se%3D2023-05-12T05%253A37%253A35Z%26sp%3Dr%26sv%3D2021-08-06%26sr%3Db%26rscd%3Dinline%26rsct%3Dimage%2Fpng%26skoid%3D6aaadede-4fb3-4698-a8f6-684d7786b067%26sktid%3Da48cca56-e6da-484e-a814-9c849652bcb3%26skt%3D2023-05-12T01%253A41%253A14Z%26ske%3D2023-05-13T01%253A41%253A14Z%26sks%3Db%26skv%3D2021-08-06%26sig%3DR2emoreNxCpeLTebY96kP8j7nVX5UyL7BPg7VmBit9E%253D&w=128&q=75"
+var defaultURL = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Louvre_Museum_Wikimedia_Commons.jpg/800px-Louvre_Museum_Wikimedia_Commons.jpg"
+var sampleImageURL = "https://upload.wikimedia.org/wikipedia/commons/0/06/Ercole_de%27_roberti%2C_san_michele_arcangelo_louvre_01.jpg"
+
 const Home: NextPage = () => {
   const router = useRouter();
   const [imageText, setImageText] = React.useState<string>("");
-  const [imageUrl, setImageUrl] = React.useState<string>("");
+  const [imageUrl, setImageUrl] = React.useState<string>(defaultURL);
+  const [imagePrintfulUrl, setPrintfulImageUrl] = React.useState<string>("");
 
   const createImage = api.imageRouter.createImage.useMutation();
+  const createPrintufl = api.printfulRouter.createPrintfulShirt.useMutation();
   const sessionApi = api.stripeRouter.createCheckoutSession.useMutation();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -21,6 +27,8 @@ const Home: NextPage = () => {
     const response = await createImage.mutateAsync({ text: imageText });
     if (response instanceof ServerError) {
       // Todo set error
+      console.log(`Create Image server error with ServerError.messages: \n ${response.message}`);
+      setImageUrl(sampleImageURL);
       return;
     }
 
@@ -28,10 +36,24 @@ const Home: NextPage = () => {
     setImageUrl(response.imageUrl);
   };
 
+  const handlePrintfulSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(`imageURL passed: ${imageUrl}`)
+    const response = await createPrintufl.mutateAsync({ imageURL: imageUrl });
+    if (response instanceof ServerError) {
+      // Todo set error
+      console.log("index handle printfulSubmit error")
+      setPrintfulImageUrl(sampleImageURL);
+      return;
+    }
+    setPrintfulImageUrl(response.imagePrintfulUrl);
+  };
+
   useEffect(() => {
     const imageUrlFromLocalStorage = localStorage.getItem("imageUrl");
     if (imageUrlFromLocalStorage) {
       setImageUrl(imageUrlFromLocalStorage);
+      return
     }
   }, []);
 
@@ -85,9 +107,32 @@ const Home: NextPage = () => {
               height={10}
               alt="image generated"
               className="w-1/2"
-              src={imageUrl}
+              src={defaultURL}
             />
           )}
+
+          <form
+            onSubmit={handlePrintfulSubmit}
+            className="flex w-full flex-col items-center justify-center gap-4"
+          >
+            <button
+              className="w-full rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+              type="submit"
+            >
+              Create Printful
+            </button>
+          </form>
+
+          {imagePrintfulUrl && (
+            <Image
+              width={1000}
+              height={1000}
+              alt="image generated"
+              className="w-1/2"
+              src={imagePrintfulUrl}
+            />
+          )}
+
         </div>
         <button
           className="w-full rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"

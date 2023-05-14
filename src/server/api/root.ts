@@ -1,5 +1,6 @@
 import { createTRPCRouter } from "~/server/api/trpc";
 import { imageRouter } from "~/server/api/routers/imageRouter";
+import { printfulRouter } from "~/server/api/routers/printfulRouter";
 import { stripeRouter } from "~/server/api/routers/stripeRouter";
 
 /**
@@ -9,6 +10,7 @@ import { stripeRouter } from "~/server/api/routers/stripeRouter";
  */
 export const appRouter = createTRPCRouter({
   imageRouter: imageRouter,
+  printfulRouter: printfulRouter,
   stripeRouter: stripeRouter,
 });
 

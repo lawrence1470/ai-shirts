@@ -25,6 +25,11 @@ const config = {
         hostname: "oaidalleapiprodscus.blob.core.windows.net",
       },
     ],
+    domains: [
+      "upload.wikimedia.org",
+      "localhost",
+      "printful-upload.s3-accelerate.amazonaws.com",
+    ]
   },
 };
 export default config;
